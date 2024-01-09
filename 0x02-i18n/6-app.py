@@ -52,4 +52,4 @@ def before_request():
 @app.route('/')
 def home() -> str:
     """Returns a render of the specified html template"""
-    return render_template('5-index.html')
+    return render_template('6-index.html')
