@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """This is a simple Flask app"""
+import datetime
 from flask import Flask, render_template, request, g
-from flask_babel import Babel
+from flask_babel import Babel, format_datetime
 from typing import Union, Dict
 import pytz
 
@@ -48,21 +49,30 @@ def get_user(id) -> Union[Dict[str, Union[str, None]], None]:
 def before_request():
     """Sets the global user"""
     setattr(g, 'user', get_user(request.args.get('login_as', 0)))
+    setattr(g, 'time', format_datetime(datetime.datetime.now()))
 
 
 @babel.timezoneselector
 def get_timezone() -> str:
     """Sets the appropriate timezone"""
-    tz = request.args.get('timezone', '').strip()
-    if not tz and g.user:
-        tz = g.user['timezone']
-    try:
-        return pytz.timezone(tz).zone
-    except pytz.exceptions.UnknownTimeZoneError:
-        return app.config['BABEL_DEFAULT_TIMEZONE']
+    tz = request.args.get('timezone', None)
+	if tz:
+		try:
+			return timezone(tz).zone
+		except pytz.exceptions.UnknownTimeZoneError:
+			pass
+	if g.user:
+		try:
+			tz = g.user.get('timezone')
+			return timezone(tz).zone
+		except pytz.exceptions.UnknownTimeZoneError:
+			pass
 
+	default_tz = app.config['BABEL_DEFAULT_TIMEZONE']
+	return default_tz
+    
 
 @app.route('/')
 def home() -> str:
     """Returns a render of the specified html template"""
-    return render_template('7-index.html')
+    return render_template('index.html')
