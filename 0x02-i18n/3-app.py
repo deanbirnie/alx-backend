@@ -12,14 +12,14 @@ class Config:
 
 
 app = Flask(__name__)
-config = app.config.from_object(Config)
+app.config.from_object(Config)
 babel = Babel(app)
 
 
 @babel.localeselector
 def get_locale() -> str:
     """Uses reques to find the best locale match"""
-    return request.accept_languages.best_match(config)
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/')
