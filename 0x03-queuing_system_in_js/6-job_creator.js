@@ -10,10 +10,8 @@ const jobData = {
 const job = queue.create('push_notification_code', jobData);
 
 job
-  .save((err) => {
-    if (!err) {
-      console.log(`Notification job created: ${job.id}`);
-    }
+  .on('enqueue', () => {
+    console.log(`Notification job created: ${job.id}`);
   })
 
   .on('complete', () => {
@@ -22,3 +20,4 @@ job
   .on('failed', () => {
     console.error('Notification job failed');
   });
+job.save();
